@@ -82,8 +82,8 @@ class ToolManager:
         self._available: dict[str, type[BaseTool]] = {
             cls.get_name(): cls for cls in self._iter_tool_classes(self._search_paths)
         }
-        self._integrate_mcp()
         self._session_id: str = str(uuid.uuid4()) 
+        self._integrate_mcp()        
 
     @property
     def _config(self) -> VibeConfig:
