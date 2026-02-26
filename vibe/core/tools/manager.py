@@ -82,6 +82,7 @@ class ToolManager:
             cls.get_name(): cls for cls in self._iter_tool_classes(self._search_paths)
         }
         self._integrate_mcp()
+        self._session_id: str = str(uuid.uuid4()) 
 
     @property
     def _config(self) -> VibeConfig:
@@ -229,6 +230,13 @@ class ToolManager:
             return 0
 
         headers = srv.http_headers()
+
+        meta = {
+            "agent": self._config.system_prompt_id or "unknown",
+            "session_id": self._session_id,
+            "model_id": self._config.active_model or "unknown",
+        }
+        
         try:
             tools: list[RemoteTool] = await list_tools_http(
                 url, headers=headers, startup_timeout_sec=srv.startup_timeout_sec
@@ -248,11 +256,7 @@ class ToolManager:
                     headers=headers,
                     startup_timeout_sec=srv.startup_timeout_sec,
                     tool_timeout_sec=srv.tool_timeout_sec,
-                    meta={
-                        "agent": agent_config.display_name.lower(),
-                        "session_id": session_id,
-                        "model_id": agent_config.active_model,
-                    },
+                    meta=meta,
                 )
                 self._available[proxy_cls.get_name()] = proxy_cls
                 added += 1
