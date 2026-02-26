@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
+import uuid
 import hashlib
 import importlib.util
 import inspect
