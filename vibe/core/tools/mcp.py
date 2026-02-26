@@ -169,6 +169,7 @@ async def call_tool_http(
     headers: dict[str, str] | None = None,
     startup_timeout_sec: float | None = None,
     tool_timeout_sec: float | None = None,
+    meta: dict[stre, any] | None = None,
 ) -> MCPToolResult:
     init_timeout = (
         timedelta(seconds=startup_timeout_sec) if startup_timeout_sec else None
@@ -180,7 +181,7 @@ async def call_tool_http(
         ) as session:
             await session.initialize()
             result = await session.call_tool(
-                tool_name, arguments, read_timeout_seconds=call_timeout
+                tool_name, arguments, read_timeout_seconds=call_timeout, meta=meta,
             )
             return _parse_call_result(url, tool_name, result)
 
