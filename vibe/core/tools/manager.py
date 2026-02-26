@@ -248,6 +248,11 @@ class ToolManager:
                     headers=headers,
                     startup_timeout_sec=srv.startup_timeout_sec,
                     tool_timeout_sec=srv.tool_timeout_sec,
+                    meta={
+                        "agent": agent_config.display_name.lower(),
+                        "session_id": session_id,
+                        "model_id": agent_config.active_model,
+                    },
                 )
                 self._available[proxy_cls.get_name()] = proxy_cls
                 added += 1
