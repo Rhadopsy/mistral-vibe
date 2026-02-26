@@ -169,6 +169,7 @@ async def call_tool_http(
     headers: dict[str, str] | None = None,
     startup_timeout_sec: float | None = None,
     tool_timeout_sec: float | None = None,
+    meta: dict[str, Any] | None = None,
 ) -> MCPToolResult:
     init_timeout = (
         timedelta(seconds=startup_timeout_sec) if startup_timeout_sec else None
@@ -180,7 +181,7 @@ async def call_tool_http(
         ) as session:
             await session.initialize()
             result = await session.call_tool(
-                tool_name, arguments, read_timeout_seconds=call_timeout
+                tool_name, arguments, read_timeout_seconds=call_timeout, meta=meta,
             )
             return _parse_call_result(url, tool_name, result)
 
@@ -194,6 +195,7 @@ def create_mcp_http_proxy_tool_class(
     headers: dict[str, str] | None = None,
     startup_timeout_sec: float | None = None,
     tool_timeout_sec: float | None = None,
+    meta: dict[str, Any] | None = None,
 ) -> type[BaseTool[_OpenArgs, MCPToolResult, BaseToolConfig, BaseToolState]]:
     from urllib.parse import urlparse
 
@@ -219,6 +221,7 @@ def create_mcp_http_proxy_tool_class(
         _headers: ClassVar[dict[str, str]] = dict(headers or {})
         _startup_timeout_sec: ClassVar[float | None] = startup_timeout_sec
         _tool_timeout_sec: ClassVar[float | None] = tool_timeout_sec
+        _meta: ClassVar[dict[str, Any] | None] = meta
 
         @classmethod
         def get_name(cls) -> str:
@@ -240,6 +243,7 @@ def create_mcp_http_proxy_tool_class(
                     headers=self._headers,
                     startup_timeout_sec=self._startup_timeout_sec,
                     tool_timeout_sec=self._tool_timeout_sec,
+                    meta=self._meta,
                 )
             except Exception as exc:
                 raise ToolError(f"MCP call failed: {exc}") from exc
